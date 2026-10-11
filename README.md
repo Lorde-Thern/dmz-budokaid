@@ -76,16 +76,16 @@ forms earned from quests or wishes are kept. DMZ's own rules still apply on top,
 | Frost Demon | Second 100K · Third 300K · Final 800K · Full Power 10M · Fifth 100M |
 | Majin | Kid 250K · Evil 1M · Super 8M · Ultra 50M |
 | Bio-Android | Semi-Perfect 300K · Perfect 1.2M · Super Perfect 10M · Ultra Perfect 60M |
-| Any race (stack forms) | **Kaioken (needs King Kai)** x2 50K · x3 150K · x4 400K · x10 2M · x20 6M · x100 75M · Ultimate 20M · Ultra Ego 500M / 2B · **Ultra Instinct 500M / 2B + Attendant Angel rank** |
+| Any race (stack forms) | **Kaioken (needs King Kai)** x2 50K · x3 150K · x4 400K · x10 2M · x20 6M · x100 75M · Ultimate 20M · **Ultra Ego (needs Beerus)** 500M / 2B · **Ultra Instinct (needs Whis) 500M / 2B + Attendant Angel rank** |
 
 Legendary forms and android forms are excluded by default (`excludedSkills`). They're lineage and cybernetics, not training, so
 they keep DMZ's normal unlocks. Ultra Instinct also needs the Angel Path (`angelRankRequired`).
 
-**Kaioken needs King Kai.** Kaioken only unlocks by BP after you've found King Kai (DMZ's `master_kaiosama` NPC) and right-clicked
-him once. He tells you he'll teach you, and from then on Kaioken levels unlock as your BP reaches them. `/budokai forms` shows
-"+ talk to King Kai" until you do. This is set by `masterRequired` in `form_unlocks.json` (skill → master entity id), so you can give
-other forms a master too, for example `"ultrainstinct": "<modid>:<npc_entity>"` for a Whis NPC from another mod. Kaioken bought directly from King
-Kai through DMZ still works as normal.
+**Some forms need a master.** Kaioken needs **King Kai** (`master_kaiosama`), Ultra Instinct needs **Whis** (`master_whis`) and
+Ultra Ego needs **Beerus** (`master_beerus`), all DMZ NPCs. A form only unlocks by BP after you've found its master and right-clicked
+them once. They tell you they'll teach you, and from then on that form's levels unlock as your BP reaches them. `/budokai forms` shows
+"+ talk to <master>" until you do. This is set by `masterRequired` in `form_unlocks.json` (skill → master entity id), so you can give
+other forms a master too, or change who teaches what. Forms bought directly from a master through DMZ still work as normal.
 
 Rough solo training time with default settings: SSJ about 3-4 hours of mixed training, SSJ2 roughly 25-30 hours. Partners and leeching cut that a lot.
 Tune `statXpGrowthPerPoint`, `globalGainMultiplier` or the thresholds to taste, then run `/budokai reload`.

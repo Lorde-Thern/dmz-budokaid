@@ -80,13 +80,22 @@ public final class FormUnlockConfig {
 		public List<String> excludedSkills = new ArrayList<>(List.of("legendaryforms", "androidforms"));
 		/**
 		 * Form skills that also need you to have talked to (right-clicked) a master NPC first,
-		 * as skill -> entity id. Kaioken needs King Kai, like in the show.
+		 * as skill -> entity id. Like in the show: Kaioken needs King Kai, Ultra Instinct needs Whis,
+		 * Ultra Ego needs Beerus.
 		 */
-		public Map<String, String> masterRequired = new LinkedHashMap<>(Map.of("kaioken", "dragonminez:master_kaiosama"));
+		public Map<String, String> masterRequired = defaultMasters();
 		/** Form skills that also need an Angel Path rank. */
 		public Map<String, Integer> angelRankRequired = new LinkedHashMap<>();
 		public Map<String, Map<String, Map<String, Double>>> races = new LinkedHashMap<>();
 		public Map<String, Map<String, Double>> stackForms = new LinkedHashMap<>();
+
+		private static Map<String, String> defaultMasters() {
+			Map<String, String> masters = new LinkedHashMap<>();
+			masters.put("kaioken", "dragonminez:master_kaiosama");
+			masters.put("ultrainstinct", "dragonminez:master_whis");
+			masters.put("ultraego", "dragonminez:master_beerus");
+			return masters;
+		}
 
 		/** BP for a race form, or null if not listed. */
 		public Double raceFormBp(String race, String group, String form) {
