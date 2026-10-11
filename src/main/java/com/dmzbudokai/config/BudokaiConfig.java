@@ -93,11 +93,11 @@ public final class BudokaiConfig {
 		b.push("statGrowth");
 		STAT_COST_BASE = b
 				.comment("Training XP needed for the first point in a stat.")
-				.defineInRange("statCostBase", 10.0, 0.01, 1.0E9);
+				.defineInRange("statCostBase", 12.5, 0.01, 1.0E9);
 		STAT_COST_PER_POINT = b
 				.comment("Extra training XP needed per point you already have in that stat.",
 						"cost = statCostBase + currentStat * statCostPerPoint")
-				.defineInRange("statCostPerPoint", 0.05, 0.0, 1.0E6);
+				.defineInRange("statCostPerPoint", 0.0625, 0.0, 1.0E6);
 		MAX_POINTS_PER_REP = b
 				.comment("Safety cap on how many points one rep can give a single stat.")
 				.defineInRange("maxPointsPerRep", 50, 1, 100000);

@@ -1,10 +1,15 @@
 package com.dmzbudokai.data;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Per-player training state. Saved fields are the stat XP banks and Angel Path progress;
@@ -18,6 +23,7 @@ public class TrainingData {
 	private long angelRejoinAtMs;
 	private boolean haloForcedByAngel;
 	private final Map<String, Integer> announcedFormLevels = new HashMap<>();
+	private final Set<String> metMasters = new HashSet<>();
 
 	// Runtime
 	private long lastRepTick = Long.MIN_VALUE / 2;
@@ -56,6 +62,10 @@ public class TrainingData {
 	/** Highest form skill level we've already told the player about (so re-unlocks after a DMZ reload stay quiet). */
 	public int getAnnouncedFormLevel(String skill) { return announcedFormLevels.getOrDefault(skill, 0); }
 	public void setAnnouncedFormLevel(String skill, int level) { announcedFormLevels.put(skill, level); }
+
+	/** Master NPCs (entity ids) this player has talked to. */
+	public boolean hasMetMaster(String entityId) { return metMasters.contains(entityId); }
+	public boolean addMetMaster(String entityId) { return metMasters.add(entityId); }
 
 	public long getLastRepTick() { return lastRepTick; }
 	public void setLastRepTick(long lastRepTick) { this.lastRepTick = lastRepTick; }
@@ -102,6 +112,9 @@ public class TrainingData {
 		CompoundTag forms = new CompoundTag();
 		announcedFormLevels.forEach(forms::putInt);
 		tag.put("AnnouncedForms", forms);
+		ListTag masters = new ListTag();
+		metMasters.forEach(id -> masters.add(StringTag.valueOf(id)));
+		tag.put("MetMasters", masters);
 		return tag;
 	}
 
@@ -119,6 +132,11 @@ public class TrainingData {
 		CompoundTag forms = tag.getCompound("AnnouncedForms");
 		for (String key : forms.getAllKeys()) {
 			announcedFormLevels.put(key, forms.getInt(key));
+		}
+		metMasters.clear();
+		ListTag masters = tag.getList("MetMasters", Tag.TAG_STRING);
+		for (int i = 0; i < masters.size(); i++) {
+			metMasters.add(masters.getString(i));
 		}
 	}
 

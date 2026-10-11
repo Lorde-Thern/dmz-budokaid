@@ -71,12 +71,18 @@ public final class FormUnlockConfig {
 		public String _readme = "Base Battle Power (no power release) needed to unlock each DMZ form. "
 				+ "races.<race>.<group>.<form> = BP. Race \"*\" applies to every race. "
 				+ "Forms not listed use defaultFirstFormBp * defaultBpMultiplierPerLevel^(unlock level - 1). "
+				+ "masterRequired: form skills that also need you to right-click a master NPC first (skill -> entity id). "
 				+ "Use /budokai forms in game to see the race, group and form names DMZ is using. "
 				+ "Reload with /budokai reload.";
 		public double defaultFirstFormBp = 1_000_000;
 		public double defaultBpMultiplierPerLevel = 3.0;
 		/** DMZ form skills that BP never unlocks (they keep their normal DMZ unlock: quests, wishes, mutations...). */
 		public List<String> excludedSkills = new ArrayList<>(List.of("legendaryforms", "androidforms"));
+		/**
+		 * Form skills that also need you to have talked to (right-clicked) a master NPC first,
+		 * as skill -> entity id. Kaioken needs King Kai, like in the show.
+		 */
+		public Map<String, String> masterRequired = new LinkedHashMap<>(Map.of("kaioken", "dragonminez:master_kaiosama"));
 		/** Form skills that also need an Angel Path rank. */
 		public Map<String, Integer> angelRankRequired = new LinkedHashMap<>();
 		public Map<String, Map<String, Map<String, Double>>> races = new LinkedHashMap<>();
@@ -101,6 +107,11 @@ public final class FormUnlockConfig {
 			return excludedSkills.contains(lower(skill));
 		}
 
+		/** Entity id of the master this skill needs, or "" if none. */
+		public String masterFor(String skill) {
+			return masterRequired.getOrDefault(lower(skill), "");
+		}
+
 		public int angelRankFor(String skill) {
 			return angelRankRequired.getOrDefault(lower(skill), 0);
 		}
@@ -119,6 +130,9 @@ public final class FormUnlockConfig {
 			Map<String, Integer> angel = new LinkedHashMap<>();
 			angelRankRequired.forEach((k, v) -> angel.put(lower(k), v == null ? 0 : v));
 			angelRankRequired = angel;
+			Map<String, String> masters = new LinkedHashMap<>();
+			if (masterRequired != null) masterRequired.forEach((k, v) -> { if (v != null && !v.isBlank()) masters.put(lower(k), lower(v.trim())); });
+			masterRequired = masters;
 
 			Map<String, Map<String, Map<String, Double>>> r = new LinkedHashMap<>();
 			if (races != null) races.forEach((race, groups) -> r.put(lower(race), lowerGroups(groups)));

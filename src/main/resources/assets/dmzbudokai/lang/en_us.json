@@ -60,8 +60,11 @@
   "dmzbudokai.forms.line.locked": "[✘] %s - %s BP",
   "dmzbudokai.forms.line.excluded": "[-] %s - not unlocked by BP (DMZ skill: %s)",
   "dmzbudokai.forms.line.angel": " + Angel Path: %s",
+  "dmzbudokai.forms.line.master": " + talk to %s",
+  "dmzbudokai.forms.line.master_met": " (trained by %s)",
   "dmzbudokai.forms.cap_warning": "Warning: Dragon Mine Z's maxValue is %s, which caps your stats too low for the higher forms. Ask an admin to raise it to %s.",
   "dmzbudokai.forms.unlocked": "Your power surges! Unlocked: %s",
+  "dmzbudokai.forms.master_met": "%s has agreed to teach you: %s. Reach the Battle Power to unlock it.",
   "dmzbudokai.reload.done": "Reloaded form_unlocks.json",
   "dmzbudokai.reload.failed": "Could not reload form_unlocks.json: %s",
   "dmzbudokai.admin.angelrank": "Set %s's Angel rank to %s"

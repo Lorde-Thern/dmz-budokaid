@@ -39,7 +39,7 @@ public final class FormUnlocks {
 
 	/** One form and what it needs. */
 	public record FormEntry(String group, String form, String skill, int level, double bp, boolean stack, boolean excluded,
-							int angelRank) {
+							int angelRank, String master) {
 	}
 
 	/** Every form this player's race (plus stack forms) has, in unlock order. */
@@ -59,7 +59,7 @@ public final class FormUnlocks {
 				if (level <= 0) continue; // free forms (e.g. Oozaru) need no unlock
 				Double bp = cfg.raceFormBp(race, groupName, form.getName());
 				entries.add(new FormEntry(groupName, form.getName(), skill, level, bp != null ? bp : cfg.fallbackBp(level),
-						false, cfg.isExcluded(skill), cfg.angelRankFor(skill)));
+						false, cfg.isExcluded(skill), cfg.angelRankFor(skill), cfg.masterFor(skill)));
 			}
 		}
 
@@ -74,7 +74,7 @@ public final class FormUnlocks {
 				if (level <= 0) continue;
 				Double bp = cfg.stackFormBp(groupName, form.getName());
 				entries.add(new FormEntry(groupName, form.getName(), skill, level, bp != null ? bp : cfg.fallbackBp(level),
-						true, cfg.isExcluded(skill), cfg.angelRankFor(skill)));
+						true, cfg.isExcluded(skill), cfg.angelRankFor(skill), cfg.masterFor(skill)));
 			}
 		}
 
@@ -114,6 +114,8 @@ public final class FormUnlocks {
 		for (Map.Entry<String, TreeMap<Integer, Double>> skill : requirementsBySkill(entries).entrySet()) {
 			String skillName = skill.getKey();
 			if (data.getAngelRank() < FormUnlockConfig.get().angelRankFor(skillName)) continue;
+			String master = FormUnlockConfig.get().masterFor(skillName);
+			if (!master.isEmpty() && !data.hasMetMaster(master)) continue;
 
 			int earned = 0;
 			for (Map.Entry<Integer, Double> level : skill.getValue().entrySet()) {
@@ -141,9 +143,10 @@ public final class FormUnlocks {
 		}
 	}
 
-	/** True if the BP requirement (and Angel rank, if any) for this form is met. */
+	/** True if the BP requirement (and Angel rank and master, if any) for this form is met. */
 	public static boolean meets(FormEntry entry, double bp, TrainingData data) {
-		return bp >= entry.bp() && data.getAngelRank() >= entry.angelRank();
+		return bp >= entry.bp() && data.getAngelRank() >= entry.angelRank()
+				&& (entry.master().isEmpty() || data.hasMetMaster(entry.master()));
 	}
 
 	private static String groupName(String key, FormConfig group) {

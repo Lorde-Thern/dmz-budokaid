@@ -202,6 +202,11 @@ public final class BudokaiCommand {
 				line = line.copy().append(Component.translatable("dmzbudokai.forms.line.angel",
 						Component.translatable(AngelPath.rankKey(entry.angelRank()))));
 			}
+			if (!entry.master().isEmpty()) {
+				boolean metMaster = data.hasMetMaster(entry.master());
+				line = line.copy().append(Component.translatable(metMaster ? "dmzbudokai.forms.line.master_met" : "dmzbudokai.forms.line.master",
+						FormEvents.masterName(entry.master())));
+			}
 			send(ctx, line.copy().withStyle(color));
 		}
 

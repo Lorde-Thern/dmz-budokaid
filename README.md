@@ -30,7 +30,7 @@ Every rep adds **training XP** to each stat it trains. When a stat's XP bank is 
 
 ```
 XP per rep        = activityXp * (1 + currentStat * statXpGrowthPerPoint) * bonuses   (growth default 0.0125)
-XP for next point = statCostBase + currentStat * statCostPerPoint                  (defaults: 10 + stat * 0.05)
+XP for next point = statCostBase + currentStat * statCostPerPoint                  (defaults: 12.5 + stat * 0.0625)
 ```
 
 Early on, a point takes a few reps. Later it settles at about one point per rep per stat, so millions of BP are reachable
@@ -76,12 +76,18 @@ forms earned from quests or wishes are kept. DMZ's own rules still apply on top,
 | Frost Demon | Second 100K · Third 300K · Final 800K · Full Power 10M · Fifth 100M |
 | Majin | Kid 250K · Evil 1M · Super 8M · Ultra 50M |
 | Bio-Android | Semi-Perfect 300K · Perfect 1.2M · Super Perfect 10M · Ultra Perfect 60M |
-| Any race (stack forms) | Kaioken x2 50K · x3 150K · x4 400K · x10 2M · x20 6M · x100 75M · Ultimate 20M · Ultra Ego 500M / 2B · **Ultra Instinct 500M / 2B + Attendant Angel rank** |
+| Any race (stack forms) | **Kaioken (needs King Kai)** x2 50K · x3 150K · x4 400K · x10 2M · x20 6M · x100 75M · Ultimate 20M · Ultra Ego 500M / 2B · **Ultra Instinct 500M / 2B + Attendant Angel rank** |
 
 Legendary forms and android forms are excluded by default (`excludedSkills`). They're lineage and cybernetics, not training, so
 they keep DMZ's normal unlocks. Ultra Instinct also needs the Angel Path (`angelRankRequired`).
 
-Rough solo training time with default settings: SSJ about 2-3 hours of mixed training, SSJ2 about a day. Partners and leeching cut that a lot.
+**Kaioken needs King Kai.** Kaioken only unlocks by BP after you've found King Kai (DMZ's `master_kaiosama` NPC) and right-clicked
+him once. He tells you he'll teach you, and from then on Kaioken levels unlock as your BP reaches them. `/budokai forms` shows
+"+ talk to King Kai" until you do. This is set by `masterRequired` in `form_unlocks.json` (skill → master entity id), so you can give
+other forms a master too, for example `"ultrainstinct": "<modid>:<npc_entity>"` for a Whis NPC from another mod. Kaioken bought directly from King
+Kai through DMZ still works as normal.
+
+Rough solo training time with default settings: SSJ about 3-4 hours of mixed training, SSJ2 roughly 25-30 hours. Partners and leeching cut that a lot.
 Tune `statXpGrowthPerPoint`, `globalGainMultiplier` or the thresholds to taste, then run `/budokai reload`.
 
 ### Raise Dragon Mine Z's stat cap
