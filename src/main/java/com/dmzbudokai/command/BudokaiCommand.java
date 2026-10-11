@@ -7,6 +7,9 @@ import com.dmzbudokai.compat.NoeaCompat;
 import com.dmzbudokai.config.BudokaiConfig;
 import com.dmzbudokai.data.TrainingData;
 import com.dmzbudokai.data.TrainingDataProvider;
+import com.dmzbudokai.forms.FormEvents;
+import com.dmzbudokai.forms.FormUnlockConfig;
+import com.dmzbudokai.forms.FormUnlocks;
 import com.dmzbudokai.training.TrainingManager;
 import com.dragonminez.common.stats.StatsData;
 import com.mojang.brigadier.CommandDispatcher;
@@ -23,11 +26,14 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
  * /budokai                       – your training summary
  * /budokai angel join|leave|info – the Angel Path
+ * /budokai forms                 – every transformation for your race and the BP it needs
+ * /budokai reload                – reload form_unlocks.json (op level 2)
  * /budokai admin angelrank <player> <rank>  (op level 2)
  */
 @Mod.EventBusSubscriber(modid = DMZBudokai.MOD_ID)
@@ -53,6 +59,10 @@ public final class BudokaiCommand {
 							AngelPath.leave(ctx.getSource().getPlayerOrException(), false);
 							return 1;
 						})))
+				.then(Commands.literal("forms").executes(BudokaiCommand::forms))
+				.then(Commands.literal("reload")
+						.requires(source -> source.hasPermission(2))
+						.executes(BudokaiCommand::reload))
 				.then(Commands.literal("admin")
 						.requires(source -> source.hasPermission(2))
 						.then(Commands.literal("angelrank")
@@ -151,6 +161,64 @@ public final class BudokaiCommand {
 		}
 		ctx.getSource().sendSuccess(() -> Component.translatable("dmzbudokai.admin.angelrank",
 				target.getDisplayName(), rank), true);
+		return 1;
+	}
+
+	private static int forms(CommandContext<CommandSourceStack> ctx) throws CommandSyntaxException {
+		ServerPlayer player = ctx.getSource().getPlayerOrException();
+		Optional<StatsData> statsOpt = DmzBridge.stats(player);
+		Optional<TrainingData> dataOpt = TrainingDataProvider.get(player);
+		if (statsOpt.isEmpty() || dataOpt.isEmpty() || !DmzBridge.hasCharacter(statsOpt.get())) {
+			ctx.getSource().sendFailure(Component.translatable("dmzbudokai.message.no_character"));
+			return 0;
+		}
+		StatsData stats = statsOpt.get();
+		TrainingData data = dataOpt.get();
+		double bp = DmzBridge.baseBattlePower(stats);
+
+		send(ctx, Component.translatable("dmzbudokai.forms.header", DmzBridge.race(stats), FormUnlocks.formatBp(bp))
+				.withStyle(ChatFormatting.GOLD, ChatFormatting.BOLD));
+		if (!BudokaiConfig.BP_FORM_UNLOCKS.get()) {
+			send(ctx, Component.translatable("dmzbudokai.forms.disabled").withStyle(ChatFormatting.GRAY));
+		}
+
+		List<FormUnlocks.FormEntry> entries = FormUnlocks.entriesFor(stats);
+		if (entries.isEmpty()) {
+			send(ctx, Component.translatable("dmzbudokai.forms.none").withStyle(ChatFormatting.GRAY));
+		}
+		for (FormUnlocks.FormEntry entry : entries) {
+			String id = entry.group() + "." + entry.form();
+			if (entry.excluded()) {
+				send(ctx, Component.translatable("dmzbudokai.forms.line.excluded", id, entry.skill())
+						.withStyle(ChatFormatting.DARK_GRAY));
+				continue;
+			}
+			boolean owned = DmzBridge.skillLevel(stats, entry.skill()) >= entry.level();
+			boolean met = FormUnlocks.meets(entry, bp, data);
+			ChatFormatting color = owned ? ChatFormatting.GREEN : met ? ChatFormatting.YELLOW : ChatFormatting.RED;
+			Component line = Component.translatable(owned ? "dmzbudokai.forms.line.owned" : "dmzbudokai.forms.line.locked",
+					id, FormUnlocks.formatBp(entry.bp()));
+			if (entry.angelRank() > 0) {
+				line = line.copy().append(Component.translatable("dmzbudokai.forms.line.angel",
+						Component.translatable(AngelPath.rankKey(entry.angelRank()))));
+			}
+			send(ctx, line.copy().withStyle(color));
+		}
+
+		if (FormEvents.isStatCapTooLow()) {
+			send(ctx, Component.translatable("dmzbudokai.forms.cap_warning", DmzBridge.dmzMaxValue(),
+					BudokaiConfig.RECOMMENDED_DMZ_MAX_VALUE.get()).withStyle(ChatFormatting.DARK_RED));
+		}
+		return 1;
+	}
+
+	private static int reload(CommandContext<CommandSourceStack> ctx) {
+		String error = FormUnlockConfig.load();
+		if (error != null) {
+			ctx.getSource().sendFailure(Component.translatable("dmzbudokai.reload.failed", error));
+			return 0;
+		}
+		ctx.getSource().sendSuccess(() -> Component.translatable("dmzbudokai.reload.done"), true);
 		return 1;
 	}
 

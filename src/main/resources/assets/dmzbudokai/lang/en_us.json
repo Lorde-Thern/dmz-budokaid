@@ -2,21 +2,18 @@
   "block.dmzbudokai.punching_bag": "Punching Bag",
   "item.dmzbudokai.training_weights": "Training Weights",
   "item.dmzbudokai.training_weights.tooltip": "Hold right-click to lift. Trains Resistance and Vitality.",
-
   "dmzbudokai.activity.punching_bag": "Punching Bag",
   "dmzbudokai.activity.weights": "Weight Lifting",
   "dmzbudokai.activity.meditation": "Meditation",
   "dmzbudokai.activity.combat_hit": "Sparring (Offense)",
   "dmzbudokai.activity.combat_hurt": "Sparring (Defense)",
   "dmzbudokai.activity.sprint": "Roadwork",
-
   "dmzbudokai.stat.str": "Strength",
   "dmzbudokai.stat.skp": "Strike Power",
   "dmzbudokai.stat.res": "Resistance",
   "dmzbudokai.stat.vit": "Vitality",
   "dmzbudokai.stat.pwr": "Ki Power",
   "dmzbudokai.stat.ene": "Energy",
-
   "dmzbudokai.hud.training": "Training: %s",
   "dmzbudokai.hud.bp": "Battle Power: %s",
   "dmzbudokai.hud.solo": "Training solo",
@@ -25,16 +22,13 @@
   "dmzbudokai.hud.mentor": "Mentor bonus (%s)",
   "dmzbudokai.hud.angel_bonus": "Angelic guidance (%s)",
   "dmzbudokai.hud.total": "Total gains: %s",
-
   "dmzbudokai.message.exhausted": "You're too exhausted to train. Rest to recover stamina.",
   "dmzbudokai.message.no_character": "Create your Dragon Mine Z character first.",
-
   "dmzbudokai.info.header": "== Budokai Training ==",
   "dmzbudokai.info.bp": "Battle Power: %s (base %s)",
   "dmzbudokai.info.stat": "%s: %s  (%s%% to next point)",
   "dmzbudokai.info.tp_disabled": "Training Points are disabled: train to grow stronger.",
   "dmzbudokai.info.angel": "Angel Path: %s",
-
   "dmzbudokai.angel.rank.0": "Mortal",
   "dmzbudokai.angel.rank.1": "Angel Trainee",
   "dmzbudokai.angel.rank.2": "Attendant Angel",
@@ -59,6 +53,16 @@
   "dmzbudokai.angel.info.alignment": "Alignment: %s (you fall below %s)",
   "dmzbudokai.angel.info.next": "Next rank %s: Divine XP %s/%s, base BP %s/%s",
   "dmzbudokai.angel.info.max": "You have reached the highest rank.",
-
+  "dmzbudokai.forms.header": "== Transformations (%s) - your base BP: %s ==",
+  "dmzbudokai.forms.disabled": "BP form unlocks are turned off on this server.",
+  "dmzbudokai.forms.none": "Your race has no unlockable forms.",
+  "dmzbudokai.forms.line.owned": "[✔] %s - %s BP",
+  "dmzbudokai.forms.line.locked": "[✘] %s - %s BP",
+  "dmzbudokai.forms.line.excluded": "[-] %s - not unlocked by BP (DMZ skill: %s)",
+  "dmzbudokai.forms.line.angel": " + Angel Path: %s",
+  "dmzbudokai.forms.cap_warning": "Warning: Dragon Mine Z's maxValue is %s, which caps your stats too low for the higher forms. Ask an admin to raise it to %s.",
+  "dmzbudokai.forms.unlocked": "Your power surges! Unlocked: %s",
+  "dmzbudokai.reload.done": "Reloaded form_unlocks.json",
+  "dmzbudokai.reload.failed": "Could not reload form_unlocks.json: %s",
   "dmzbudokai.admin.angelrank": "Set %s's Angel rank to %s"
 }

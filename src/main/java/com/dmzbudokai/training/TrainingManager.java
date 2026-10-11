@@ -80,8 +80,8 @@ public final class TrainingManager {
 	 * Returns the number of points gained.
 	 */
 	public static int addStatXp(StatsData stats, TrainingData data, String stat, double xp) {
-		double bank = data.getStatXp(stat) + xp;
 		int value = DmzBridge.statValue(stats, stat);
+		double bank = data.getStatXp(stat) + xp * (1.0 + value * BudokaiConfig.STAT_XP_GROWTH_PER_POINT.get());
 		int toAdd = 0;
 		int cap = BudokaiConfig.MAX_POINTS_PER_REP.get();
 

@@ -17,6 +17,7 @@ public class TrainingData {
 	private double divineXp;
 	private long angelRejoinAtMs;
 	private boolean haloForcedByAngel;
+	private final Map<String, Integer> announcedFormLevels = new HashMap<>();
 
 	// Runtime
 	private long lastRepTick = Long.MIN_VALUE / 2;
@@ -51,6 +52,10 @@ public class TrainingData {
 
 	public boolean isHaloForcedByAngel() { return haloForcedByAngel; }
 	public void setHaloForcedByAngel(boolean haloForcedByAngel) { this.haloForcedByAngel = haloForcedByAngel; }
+
+	/** Highest form skill level we've already told the player about (so re-unlocks after a DMZ reload stay quiet). */
+	public int getAnnouncedFormLevel(String skill) { return announcedFormLevels.getOrDefault(skill, 0); }
+	public void setAnnouncedFormLevel(String skill, int level) { announcedFormLevels.put(skill, level); }
 
 	public long getLastRepTick() { return lastRepTick; }
 	public void setLastRepTick(long lastRepTick) { this.lastRepTick = lastRepTick; }
@@ -94,6 +99,9 @@ public class TrainingData {
 		tag.putDouble("DivineXp", divineXp);
 		tag.putLong("AngelRejoinAt", angelRejoinAtMs);
 		tag.putBoolean("HaloForcedByAngel", haloForcedByAngel);
+		CompoundTag forms = new CompoundTag();
+		announcedFormLevels.forEach(forms::putInt);
+		tag.put("AnnouncedForms", forms);
 		return tag;
 	}
 
@@ -107,6 +115,11 @@ public class TrainingData {
 		divineXp = tag.getDouble("DivineXp");
 		angelRejoinAtMs = tag.getLong("AngelRejoinAt");
 		haloForcedByAngel = tag.getBoolean("HaloForcedByAngel");
+		announcedFormLevels.clear();
+		CompoundTag forms = tag.getCompound("AnnouncedForms");
+		for (String key : forms.getAllKeys()) {
+			announcedFormLevels.put(key, forms.getInt(key));
+		}
 	}
 
 	public void copyFrom(TrainingData other) {

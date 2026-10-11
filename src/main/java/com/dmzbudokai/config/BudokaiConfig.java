@@ -20,6 +20,11 @@ public final class BudokaiConfig {
 	public static final ForgeConfigSpec.DoubleValue STAT_COST_BASE;
 	public static final ForgeConfigSpec.DoubleValue STAT_COST_PER_POINT;
 	public static final ForgeConfigSpec.IntValue MAX_POINTS_PER_REP;
+	public static final ForgeConfigSpec.DoubleValue STAT_XP_GROWTH_PER_POINT;
+
+	// Transformations
+	public static final ForgeConfigSpec.BooleanValue BP_FORM_UNLOCKS;
+	public static final ForgeConfigSpec.IntValue RECOMMENDED_DMZ_MAX_VALUE;
 
 	// Activities
 	public static final ForgeConfigSpec.DoubleValue PUNCHING_BAG_XP;
@@ -96,6 +101,25 @@ public final class BudokaiConfig {
 		MAX_POINTS_PER_REP = b
 				.comment("Safety cap on how many points one rep can give a single stat.")
 				.defineInRange("maxPointsPerRep", 50, 1, 100000);
+		STAT_XP_GROWTH_PER_POINT = b
+				.comment("XP per rep grows with the stat being trained: xp *= 1 + currentStat * statXpGrowthPerPoint.",
+						"Keeps late-game training worthwhile so millions of BP are reachable (Xeno-game style).",
+						"With the defaults, high stats settle at about 1 point per rep. 0 = flat gains (much grindier).")
+				.defineInRange("statXpGrowthPerPoint", 0.0125, 0.0, 1000.0);
+		b.pop();
+
+		b.push("transformations");
+		BP_FORM_UNLOCKS = b
+				.comment("Unlock DMZ transformations by reaching Battle Power thresholds.",
+						"Thresholds live in config/dmzbudokai/form_unlocks.json (realistic defaults: Super Saiyan at 1M base BP).",
+						"Works with every race DMZ loads, including custom races: unlisted forms get a BP from their unlock level.")
+				.define("bpFormUnlocks", true);
+		RECOMMENDED_DMZ_MAX_VALUE = b
+				.comment("DMZ's maxValue (general-server.json) caps total stats at maxValue * 6, which caps Battle Power.",
+						"Roughly: 10000 (DMZ default) = 1.6M base BP, 250000 = 78M, 1000000 = 414M, 4000000 = 2.2B.",
+						"If DMZ's value is below this number, the server log and /budokai forms warn that higher",
+						"forms can't be reached. 0 = never warn.")
+				.defineInRange("recommendedDmzMaxValue", 1000000, 0, Integer.MAX_VALUE);
 		b.pop();
 
 		b.push("activities");
