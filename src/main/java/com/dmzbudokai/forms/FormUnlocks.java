@@ -58,7 +58,7 @@ public final class FormUnlocks {
 				int level = form.getUnlockOnSkillLevel() != null ? form.getUnlockOnSkillLevel() : 0;
 				if (level <= 0) continue; // free forms (e.g. Oozaru) need no unlock
 				Double bp = cfg.raceFormBp(race, groupName, form.getName());
-				entries.add(new FormEntry(groupName, form.getName(), skill, level, bp != null ? bp : cfg.fallbackBp(level),
+				entries.add(new FormEntry(groupName, form.getName(), skill, level, bp != null ? bp : cfg.fallbackBp(skill, level),
 						false, cfg.isExcluded(skill), cfg.angelRankFor(skill), cfg.masterFor(skill)));
 			}
 		}
@@ -73,7 +73,7 @@ public final class FormUnlocks {
 				int level = form.getUnlockOnSkillLevel() != null ? form.getUnlockOnSkillLevel() : 0;
 				if (level <= 0) continue;
 				Double bp = cfg.stackFormBp(groupName, form.getName());
-				entries.add(new FormEntry(groupName, form.getName(), skill, level, bp != null ? bp : cfg.fallbackBp(level),
+				entries.add(new FormEntry(groupName, form.getName(), skill, level, bp != null ? bp : cfg.fallbackBp(skill, level),
 						true, cfg.isExcluded(skill), cfg.angelRankFor(skill), cfg.masterFor(skill)));
 			}
 		}

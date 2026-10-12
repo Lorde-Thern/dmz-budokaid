@@ -78,11 +78,14 @@ forms earned from quests or wishes are kept. DMZ's own rules still apply on top,
 | Bio-Android | Semi-Perfect 300K · Perfect 1.2M · Super Perfect 10M · Ultra Perfect 60M |
 | Any race (stack forms) | **Kaioken (needs King Kai)** x2 50K · x3 150K · x4 400K · x10 2M · x20 6M · x100 75M · Ultimate 20M · **Ultra Ego (needs Beerus)** 500M / 2B · **Ultra Instinct (needs Whis) 500M / 2B + Attendant Angel rank** |
 
+**God forms:** DMZ doesn't ship any; they come from custom race files or addons (DMZ files them under the `godforms` skill).
+Any god form without its own number in `form_unlocks.json` needs at least **150M** base BP (`skillMinimumBp`), plus Whis.
+
 Legendary forms and android forms are excluded by default (`excludedSkills`). They're lineage and cybernetics, not training, so
 they keep DMZ's normal unlocks. Ultra Instinct also needs the Angel Path (`angelRankRequired`).
 
-**Some forms need a master.** Kaioken needs **King Kai** (`master_kaiosama`), Ultra Instinct needs **Whis** (`master_whis`) and
-Ultra Ego needs **Beerus** (`master_beerus`), all DMZ NPCs. A form only unlocks by BP after you've found its master and right-clicked
+**Some forms need a master.** Kaioken needs **King Kai** (`master_kaiosama`), Ultra Instinct and **god forms** need **Whis**
+(`master_whis`), and Ultra Ego needs **Beerus** (`master_beerus`), all DMZ NPCs. A form only unlocks by BP after you've found its master and right-clicked
 them once. They tell you they'll teach you, and from then on that form's levels unlock as your BP reaches them. `/budokai forms` shows
 "+ talk to <master>" until you do. This is set by `masterRequired` in `form_unlocks.json` (skill → master entity id), so you can give
 other forms a master too, or change who teaches what. Forms bought directly from a master through DMZ still work as normal.

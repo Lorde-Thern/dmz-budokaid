@@ -80,8 +80,8 @@ public final class FormUnlockConfig {
 		public List<String> excludedSkills = new ArrayList<>(List.of("legendaryforms", "androidforms"));
 		/**
 		 * Form skills that also need you to have talked to (right-clicked) a master NPC first,
-		 * as skill -> entity id. Like in the show: Kaioken needs King Kai, Ultra Instinct needs Whis,
-		 * Ultra Ego needs Beerus.
+		 * as skill -> entity id. Like in the show: Kaioken needs King Kai, Ultra Instinct and god forms
+		 * need Whis, Ultra Ego needs Beerus.
 		 */
 		public Map<String, String> masterRequired = defaultMasters();
 		/** Form skills that also need an Angel Path rank. */
@@ -94,7 +94,23 @@ public final class FormUnlockConfig {
 			masters.put("kaioken", "dragonminez:master_kaiosama");
 			masters.put("ultrainstinct", "dragonminez:master_whis");
 			masters.put("ultraego", "dragonminez:master_beerus");
+			// DMZ files god forms under "godforms"; a group typed exactly "god" uses a skill named "god".
+			masters.put("godforms", "dragonminez:master_whis");
+			masters.put("god", "dragonminez:master_whis");
 			return masters;
+		}
+
+		/**
+		 * Lowest BP any form of a skill can need, so forms without their own number (god forms from
+		 * custom race files, for example) don't fall back to an unrealistically low requirement.
+		 */
+		public Map<String, Double> skillMinimumBp = defaultSkillMinimums();
+
+		private static Map<String, Double> defaultSkillMinimums() {
+			Map<String, Double> minimums = new LinkedHashMap<>();
+			minimums.put("godforms", 150_000_000.0);
+			minimums.put("god", 150_000_000.0);
+			return minimums;
 		}
 
 		/** BP for a race form, or null if not listed. */
@@ -106,6 +122,11 @@ public final class FormUnlockConfig {
 		public Double stackFormBp(String group, String form) {
 			Map<String, Double> forms = stackForms.get(lower(group));
 			return forms == null ? null : forms.get(lower(form));
+		}
+
+		/** BP for a form with no number of its own, never below the skill's minimum. */
+		public double fallbackBp(String skill, int level) {
+			return Math.max(skillMinimumBp.getOrDefault(lower(skill), 0.0), fallbackBp(level));
 		}
 
 		public double fallbackBp(int level) {
@@ -142,6 +163,9 @@ public final class FormUnlockConfig {
 			Map<String, String> masters = new LinkedHashMap<>();
 			if (masterRequired != null) masterRequired.forEach((k, v) -> { if (v != null && !v.isBlank()) masters.put(lower(k), lower(v.trim())); });
 			masterRequired = masters;
+			Map<String, Double> minimums = new LinkedHashMap<>();
+			if (skillMinimumBp != null) skillMinimumBp.forEach((k, v) -> { if (v != null) minimums.put(lower(k), v); });
+			skillMinimumBp = minimums;
 
 			Map<String, Map<String, Map<String, Double>>> r = new LinkedHashMap<>();
 			if (races != null) races.forEach((race, groups) -> r.put(lower(race), lowerGroups(groups)));
