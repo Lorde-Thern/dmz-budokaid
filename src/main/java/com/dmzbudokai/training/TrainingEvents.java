@@ -1,6 +1,7 @@
 package com.dmzbudokai.training;
 
 import com.dmzbudokai.DMZBudokai;
+import com.dmzbudokai.angel.AngelAbilities;
 import com.dmzbudokai.angel.AngelPath;
 import com.dmzbudokai.config.BudokaiConfig;
 import com.dmzbudokai.data.TrainingData;
@@ -71,6 +72,7 @@ public final class TrainingEvents {
 		TrainingDataProvider.get(player).ifPresent(data -> {
 			tickMeditation(player, data);
 			tickSprint(player, data);
+			AngelAbilities.recordSnapshot(player, data);
 			if (player.tickCount % 20 == 0) {
 				AngelPath.tick(player, data);
 			}
@@ -84,10 +86,12 @@ public final class TrainingEvents {
 
 		if (!meditating || anchor == null || anchor.distanceToSqr(pos) > MEDITATION_MAX_DRIFT_SQ) {
 			data.setMeditationTicks(0);
+			data.angel().setMeditationStreakTicks(0);
 			data.setMeditationAnchor(meditating ? pos : null);
 			return;
 		}
 
+		data.angel().setMeditationStreakTicks(data.angel().getMeditationStreakTicks() + 1);
 		int ticks = data.getMeditationTicks() + 1;
 		if (ticks >= BudokaiConfig.MEDITATION_REP_TICKS.get()) {
 			ticks = 0;

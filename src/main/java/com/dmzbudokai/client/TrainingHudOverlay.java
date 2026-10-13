@@ -67,8 +67,12 @@ public final class TrainingHudOverlay {
 		if (hud.angelMult() > 1.0F) {
 			lines.add(new Line(Component.translatable("dmzbudokai.hud.angel_bonus", fmt(hud.angelMult())), AQUA));
 		}
+		if (hud.blessed()) {
+			lines.add(new Line(Component.translatable("dmzbudokai.hud.blessed"), AQUA));
+		}
 		if (hud.angelRank() > 0) {
-			lines.add(new Line(Component.translatable(AngelPath.rankKey(hud.angelRank())), AQUA));
+			Component rank = Component.translatable(AngelPath.rankKey(hud.angelRank()));
+			lines.add(new Line(Component.translatable("dmzbudokai.hud.angel", rank, hud.favor()), hud.disfavored() ? GOLD : AQUA));
 		}
 		lines.add(new Line(Component.translatable("dmzbudokai.hud.total", fmt(hud.totalMult())), WHITE));
 

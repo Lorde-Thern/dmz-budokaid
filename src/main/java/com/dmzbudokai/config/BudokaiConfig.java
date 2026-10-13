@@ -79,6 +79,28 @@ public final class BudokaiConfig {
 	public static final ForgeConfigSpec.IntValue ANGEL_DODGE_COOLDOWN;
 	public static final ForgeConfigSpec.DoubleValue ANGEL_SPEED_PER_RANK;
 	public static final ForgeConfigSpec.BooleanValue ANGEL_FORCE_HALO;
+	public static final ForgeConfigSpec.BooleanValue ANGEL_REQUIRE_MENTOR;
+	public static final ForgeConfigSpec.ConfigValue<String> ANGEL_MENTOR_ENTITY;
+	public static final ForgeConfigSpec.IntValue ANGEL_TRIAL_STILLNESS_MINUTES;
+	public static final ForgeConfigSpec.IntValue ANGEL_TRIAL_MENTOR_REPS;
+	public static final ForgeConfigSpec.IntValue ANGEL_TRIAL_INSTINCT_DODGES;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_DISFAVOR_THRESHOLD;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_FAVOR_PENALTY_INNOCENT;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_FAVOR_PENALTY_BULLY;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_BULLY_BP_RATIO;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_FAVOR_PER_MEDITATION;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_FAVOR_PER_MENTOR_REP;
+	public static final ForgeConfigSpec.IntValue ANGEL_BLESS_RANK;
+	public static final ForgeConfigSpec.IntValue ANGEL_BLESS_DURATION_SECONDS;
+	public static final ForgeConfigSpec.IntValue ANGEL_BLESS_COOLDOWN_SECONDS;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_BLESS_BONUS_PER_RANK;
+	public static final ForgeConfigSpec.IntValue ANGEL_REWIND_RANK;
+	public static final ForgeConfigSpec.IntValue ANGEL_REWIND_SECONDS;
+	public static final ForgeConfigSpec.IntValue ANGEL_REWIND_COOLDOWN_MINUTES;
+	public static final ForgeConfigSpec.IntValue ANGEL_PRESENCE_RANK;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_PRESENCE_RADIUS;
+	public static final ForgeConfigSpec.IntValue ANGEL_AUTONOMOUS_RANK;
+	public static final ForgeConfigSpec.DoubleValue ANGEL_AUTONOMOUS_HEALTH;
 
 	// Dragon Block Noea compatibility
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> NOEA_MOD_IDS;
@@ -234,7 +256,8 @@ public final class BudokaiConfig {
 				.defineInRange("angelJoinAlignment", 75, 0, 100);
 		ANGEL_FALL_ALIGNMENT = b.comment("If your alignment drops below this you fall from the path.")
 				.defineInRange("angelFallAlignment", 40, 0, 100);
-		ANGEL_REJOIN_COOLDOWN_MINUTES = b.comment("Real-time minutes before a fallen or departed angel can rejoin.")
+		ANGEL_REJOIN_COOLDOWN_MINUTES = b.comment("Real-time minutes before a fallen or departed angel can rejoin.",
+						"Falling multiplies it by how many times you've fallen.")
 				.defineInRange("angelRejoinCooldownMinutes", 60, 0, 100000);
 		ANGEL_RANK_DIVINE_XP = b.comment("Divine XP needed for ranks 2, 3, 4 ... (rank 1 is given on joining).")
 				.defineList("angelRankDivineXp", List.<Number>of(500.0, 2500.0, 10000.0), o -> o instanceof Number n && n.doubleValue() >= 0);
@@ -252,6 +275,63 @@ public final class BudokaiConfig {
 				.defineInRange("angelSpeedPerRank", 0.05, 0.0, 10.0);
 		ANGEL_FORCE_HALO = b.comment("Show the DMZ halo on players walking the Angel Path.")
 				.define("angelForceHalo", true);
+
+		b.comment("Initiation: an angel must accept you as their pupil before you can begin.").push("initiation");
+		ANGEL_REQUIRE_MENTOR = b.comment("Require talking to (right-clicking) the mentor NPC before joining.")
+				.define("requireMentor", true);
+		ANGEL_MENTOR_ENTITY = b.comment("Entity id of the angel who accepts pupils. Defaults to DMZ's Whis.")
+				.define("mentorEntity", "dragonminez:master_whis");
+		b.pop();
+
+		b.comment("Trials: each rank-up past Angel Trainee also needs its trial completed.").push("trials");
+		ANGEL_TRIAL_STILLNESS_MINUTES = b.comment("Trial of Stillness (to Attendant Angel): minutes of unbroken meditation.")
+				.defineInRange("stillnessMinutes", 5, 0, 1440);
+		ANGEL_TRIAL_MENTOR_REPS = b.comment("Trial of the Mentor (to Guardian Angel): training reps done by others near you.")
+				.defineInRange("mentorReps", 500, 0, 10_000_000);
+		ANGEL_TRIAL_INSTINCT_DODGES = b.comment("Trial of Instinct (to Grand Angel): attacks dodged with Angelic Instinct.")
+				.defineInRange("instinctDodges", 40, 0, 1_000_000);
+		b.pop();
+
+		b.comment("Divine Favor (0-100): angels must stay neutral and protect the innocent.").push("divineFavor");
+		ANGEL_DISFAVOR_THRESHOLD = b.comment("Below this favor you are Disfavored: every Angel perk works at half strength.",
+						"At 0 favor you fall from the path.")
+				.defineInRange("disfavorThreshold", 50.0, 0.0, 100.0);
+		ANGEL_FAVOR_PENALTY_INNOCENT = b.comment("Favor lost for killing a villager, wandering trader or iron golem.")
+				.defineInRange("penaltyInnocent", 25.0, 0.0, 100.0);
+		ANGEL_FAVOR_PENALTY_BULLY = b.comment("Favor lost for killing a player far weaker than you.")
+				.defineInRange("penaltyBully", 20.0, 0.0, 100.0);
+		ANGEL_BULLY_BP_RATIO = b.comment("A player counts as 'far weaker' when your trained BP is this many times theirs.")
+				.defineInRange("bullyBpRatio", 10.0, 1.0, 1.0E9);
+		ANGEL_FAVOR_PER_MEDITATION = b.comment("Favor restored per meditation rep.")
+				.defineInRange("favorPerMeditation", 0.25, 0.0, 100.0);
+		ANGEL_FAVOR_PER_MENTOR_REP = b.comment("Favor restored per training rep someone does near you.")
+				.defineInRange("favorPerMentorRep", 0.1, 0.0, 100.0);
+		b.pop();
+
+		b.comment("Abilities unlocked by rank.").push("abilities");
+		ANGEL_BLESS_RANK = b.comment("Angel's Blessing: rank needed to bless other players with the Angel Staff.")
+				.defineInRange("blessRank", 2, 1, 99);
+		ANGEL_BLESS_DURATION_SECONDS = b.comment("How long a blessing lasts.")
+				.defineInRange("blessDurationSeconds", 300, 1, 86400);
+		ANGEL_BLESS_COOLDOWN_SECONDS = b.comment("Cooldown between blessings.")
+				.defineInRange("blessCooldownSeconds", 600, 0, 86400);
+		ANGEL_BLESS_BONUS_PER_RANK = b.comment("Training gain bonus a blessing gives, per rank of the angel who gave it.")
+				.defineInRange("blessBonusPerRank", 0.15, 0.0, 100.0);
+		ANGEL_REWIND_RANK = b.comment("Temporal Do-Over: rank needed. When you would die, time rewinds a few seconds instead.")
+				.defineInRange("rewindRank", 3, 1, 99);
+		ANGEL_REWIND_SECONDS = b.comment("How far back Temporal Do-Over rewinds.")
+				.defineInRange("rewindSeconds", 3, 1, 10);
+		ANGEL_REWIND_COOLDOWN_MINUTES = b.comment("Cooldown for Temporal Do-Over (real-time minutes).")
+				.defineInRange("rewindCooldownMinutes", 10, 0, 10080);
+		ANGEL_PRESENCE_RANK = b.comment("Divine Presence: rank needed. Hostile mobs near you are slowed and weakened.")
+				.defineInRange("presenceRank", 4, 1, 99);
+		ANGEL_PRESENCE_RADIUS = b.comment("Divine Presence radius in blocks.")
+				.defineInRange("presenceRadius", 8.0, 1.0, 64.0);
+		ANGEL_AUTONOMOUS_RANK = b.comment("Autonomous Instinct: rank needed. Angelic Instinct dodge chance doubles at low health.")
+				.defineInRange("autonomousRank", 4, 1, 99);
+		ANGEL_AUTONOMOUS_HEALTH = b.comment("Health fraction that counts as 'low' for Autonomous Instinct.")
+				.defineInRange("autonomousHealth", 0.3, 0.0, 1.0);
+		b.pop();
 		b.pop();
 
 		b.push("noeaCompat");

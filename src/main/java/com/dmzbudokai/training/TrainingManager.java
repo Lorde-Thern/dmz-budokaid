@@ -62,10 +62,13 @@ public final class TrainingManager {
 		}
 
 		AngelPath.onTrainingRep(player, stats, data, activity);
+		for (ServerPlayer angel : bonus.guidingAngels()) {
+			TrainingDataProvider.get(angel).ifPresent(angelData -> AngelPath.onMentored(angel, angelData));
+		}
 
 		if (gained > 0 || now - data.getLastHudSyncTick() >= BudokaiConfig.HUD_SYNC_INTERVAL.get()) {
 			data.setLastHudSyncTick(now);
-			BudokaiNetwork.sendTo(player, TrainingHudPacket.of(activity, bonus, gained, data.getAngelRank()));
+			BudokaiNetwork.sendTo(player, TrainingHudPacket.of(activity, bonus, gained, data));
 		}
 		return true;
 	}

@@ -198,27 +198,70 @@ in that list, Ragnarok is storing them outside DMZ's form config, and they'll ne
 
 ## The Angel Path
 
-Angels are the greatest teachers in the multiverse (think Whis and Vados). The path is opt-in:
+Angels are the greatest teachers in the multiverse (think Whis and Vados). They stay neutral, move without thinking and guide others
+to strength. The path is opt-in:
 
 ```
-/budokai angel info    – requirements, your rank and progress
+/budokai angel info    – requirements, rank, Divine Favor, trial progress, abilities and cooldowns
 /budokai angel join    – start the path
 /budokai angel leave   – leave it (you can't rejoin for a while)
 ```
 
-**Requirements to join (configurable):** base BP of 5,000 or more, DMZ alignment of 75 or more, and a race that isn't forbidden (see Noea below).
+### Initiation
 
-**Ranks:** Angel Trainee → Attendant Angel → Guardian Angel → Grand Angel. To rank up you need **Divine XP** (1 per training rep,
-2 per meditation rep) and base Battle Power. The defaults are 500 / 2,500 / 10,000 Divine XP and 50K / 500K / 5M BP.
+1. **Find Whis** (DMZ's `master_whis` NPC) and right-click him. If he senses potential in you, he accepts you as a pupil.
+   Demon-blooded races (see Noea below) are turned away.
+2. Meet the requirements: **alignment 75+** and **5,000 trained base BP**.
+3. `/budokai angel join`. You become an **Angel Trainee**.
 
-**Perks (per rank):**
-- +25% meditation gains
-- **Angelic guidance:** anyone training near you gets +10% gains
-- **Angelic Instinct:** 5% chance to completely dodge an attack (3 s cooldown)
-- +5% movement speed
-- The DMZ halo
+### Ranks and trials
 
-**Purity:** if your DMZ alignment drops below 40, you **fall** from the path and lose your rank and Divine XP.
+Each rank-up needs **Divine XP** (1 per training rep, 2 per meditation rep, 10 per blessing), **trained base BP**, and that rank's **trial**.
+Trial progress is kept until you rank up, so you can work on it at your own pace.
+
+| Rank | Divine XP | Base BP | Trial |
+|---|---|---|---|
+| 1. Angel Trainee | (join) | 5K | Whis accepts you |
+| 2. Attendant Angel | 500 | 50K | **Trial of Stillness:** meditate 5 minutes without breaking |
+| 3. Guardian Angel | 2,500 | 500K | **Trial of the Mentor:** 500 training reps done by other players near you |
+| 4. Grand Angel | 10,000 | 5M | **Trial of Instinct:** dodge 40 attacks with Angelic Instinct |
+
+### Abilities
+
+| Rank | Ability | What it does |
+|---|---|---|
+| 1 | Halo | The DMZ halo |
+| 1 | Divine Meditation | +25% meditation gains per rank. Meditation gives double Divine XP and restores Favor |
+| 1 | Angelic Instinct | 5% chance per rank to dodge an attack completely (3 s cooldown). +5% speed per rank |
+| 2 | Angelic Guidance | Anyone training near you gets +10% gains per rank, even if you're only watching |
+| 2 | Angel's Blessing | You receive an **Angel Staff**. Right-click another player to bless their training: +15% gains per rank for 5 minutes (10 min cooldown) |
+| 3 | Temporal Do-Over | When you would die, time rewinds 3 seconds instead: back to where you were, with your health from then (at least 25%). 10 min cooldown |
+| 4 | Divine Presence | Hostile mobs within 8 blocks are slowed and weakened |
+| 4 | Autonomous Instinct | Angelic Instinct's chance doubles below 30% health |
+
+Ultra Instinct also needs Attendant Angel rank (see Transformations).
+
+### The Angel Code and Divine Favor
+
+Angels stay neutral, protect the innocent and never prey on the weak. **Divine Favor** (0-100) tracks how well you keep the code:
+
+- **Killing an innocent** (villager, wandering trader, iron golem): **-25**
+- **Killing a player far weaker than you** (your trained BP 10× theirs or more): **-20**
+- **Meditating:** +0.25 per rep. **Teaching** (someone training near you): +0.1 per rep. **Blessing someone:** +2
+
+| Favor | Effect |
+|---|---|
+| 50-100 | Faithful. Everything works normally |
+| below 50 | **Disfavored.** Every ability works at half strength, Temporal Do-Over takes twice as long to recharge, and you can't rank up |
+| 0 | **You fall** |
+
+You also fall if your DMZ alignment drops below 40.
+
+**Falling** costs your rank, Divine XP, trial progress and Favor, and the angels won't take you back for a while: 60 minutes times the
+number of times you've fallen. Whis still remembers you, so you don't need to be accepted again.
+
+Every number here is in the `angelPath` section of `dmzbudokai-server.toml` (initiation, trials, divine favor, abilities).
+Admins can use `/budokai admin angelrank <player> <rank>` and `/budokai admin angelfavor <player> <0-100>`.
 
 ### Dragon Block Noea
 
@@ -236,6 +279,7 @@ your version, edit `angelForbiddenRaces` in the config to match. Run `/budokai a
 | `/budokai forms` | Every form for your race, its BP requirement, and whether you have it |
 | `/budokai reload` | Reload `form_unlocks.json` (op level 2) |
 | `/budokai admin angelrank <player> <rank>` | Set someone's Angel rank (op level 2; 0 removes them) |
+| `/budokai admin angelfavor <player> <0-100>` | Set someone's Divine Favor (op level 2) |
 
 ## Config
 
@@ -268,12 +312,16 @@ src/main/java/com/dmzbudokai/
   compat/BattlePower         trained BP and realistic BP (form multipliers)
   compat/MobBattlePower      converts mob BP to the realistic scale when they spawn
   mixin/                     StatsDataMixin (DMZ reports realistic BP), StatsMixin (limitless per-stat cap)
-  angel/AngelPath            Angel Path ranks, perks, purity check, Angelic Instinct
+  angel/AngelPath            Angel Path initiation, ranks, Divine Favor, falling, passive perks
+  angel/AngelTrial           the trial for each rank
+  angel/AngelAbilities       Angelic Instinct, Temporal Do-Over, Divine Presence, Angel's Blessing
+  angel/AngelCode            favor lost for killing innocents or far weaker players
+  angel/AngelState           saved Angel Path progress
   forms/                     BP transformation unlocks (FormUnlocks) and form_unlocks.json (FormUnlockConfig)
   compat/DmzBridge           every Dragon Mine Z API call, in one place
   compat/NoeaCompat          Dragon Block Noea race rules
   data/                      per-player saved training data (Forge capability)
-  content/                   Punching Bag block, Training Weights item
+  content/                   Punching Bag block, Training Weights and Angel Staff items
   network/, client/          training HUD
   command/BudokaiCommand     /budokai
 ```

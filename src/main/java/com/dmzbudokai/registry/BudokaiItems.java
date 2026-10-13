@@ -1,6 +1,7 @@
 package com.dmzbudokai.registry;
 
 import com.dmzbudokai.DMZBudokai;
+import com.dmzbudokai.content.AngelStaffItem;
 import com.dmzbudokai.content.TrainingWeightsItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -16,6 +17,9 @@ public final class BudokaiItems {
 
 	public static final RegistryObject<Item> TRAINING_WEIGHTS = ITEMS.register("training_weights",
 			() -> new TrainingWeightsItem(new Item.Properties().stacksTo(1)));
+
+	public static final RegistryObject<Item> ANGEL_STAFF = ITEMS.register("angel_staff",
+			() -> new AngelStaffItem(new Item.Properties()));
 
 	private BudokaiItems() {
 	}

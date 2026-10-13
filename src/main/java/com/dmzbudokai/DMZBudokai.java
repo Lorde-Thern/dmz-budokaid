@@ -49,6 +49,7 @@ public class DMZBudokai {
 		}
 		if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
 			event.accept(BudokaiItems.TRAINING_WEIGHTS);
+			event.accept(BudokaiItems.ANGEL_STAFF);
 		}
 	}
 }

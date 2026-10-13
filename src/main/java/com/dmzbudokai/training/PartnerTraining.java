@@ -1,5 +1,7 @@
 package com.dmzbudokai.training;
 
+import com.dmzbudokai.angel.AngelAbilities;
+import com.dmzbudokai.angel.AngelPath;
 import com.dmzbudokai.compat.DmzBridge;
 import com.dmzbudokai.config.BudokaiConfig;
 import com.dmzbudokai.data.TrainingData;
@@ -7,6 +9,8 @@ import com.dmzbudokai.data.TrainingDataProvider;
 import com.dragonminez.common.stats.StatsData;
 import net.minecraft.server.level.ServerPlayer;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,20 +34,31 @@ public final class PartnerTraining {
 		int partners = 0;
 		double strongestBp = 0.0;
 		ServerPlayer strongest = null;
-		int bestAngelRank = 0;
+		double bestGuidance = 0.0;
+		List<ServerPlayer> guidingAngels = new ArrayList<>();
+		int guidanceRank = AngelAbilities.Ability.ANGELIC_GUIDANCE.rank();
 
 		for (ServerPlayer other : player.serverLevel().players()) {
 			if (other == player || other.isSpectator() || !other.isAlive()) continue;
 			if (other.distanceToSqr(player) > radiusSq) continue;
 
 			Optional<TrainingData> otherTraining = TrainingDataProvider.get(other);
-			if (otherTraining.isEmpty() || !isActivelyTraining(otherTraining.get(), now)) continue;
+			if (otherTraining.isEmpty()) continue;
+
+			// Angelic Guidance: an angel only has to be watching, not training themselves.
+			TrainingData otherData = otherTraining.get();
+			if (AngelPath.hasRank(otherData, guidanceRank)) {
+				guidingAngels.add(other);
+				bestGuidance = Math.max(bestGuidance,
+						otherData.getAngelRank() * BudokaiConfig.ANGEL_MENTOR_BONUS_PER_RANK.get() * AngelPath.perkStrength(otherData));
+			}
+
+			if (!isActivelyTraining(otherData, now)) continue;
 
 			Optional<StatsData> otherStats = DmzBridge.stats(other);
 			if (otherStats.isEmpty() || !DmzBridge.hasCharacter(otherStats.get())) continue;
 
 			partners++;
-			bestAngelRank = Math.max(bestAngelRank, otherTraining.get().getAngelRank());
 
 			double otherBp = DmzBridge.baseBattlePower(otherStats.get());
 			if (otherBp > strongestBp) {
@@ -68,14 +83,13 @@ public final class PartnerTraining {
 
 		double mentorMult = data.getMentoringUntilTick() >= now ? BudokaiConfig.MENTOR_MULTIPLIER.get() : 1.0;
 
-		double angelMult = 1.0;
-		if (bestAngelRank > 0) {
-			angelMult *= 1.0 + bestAngelRank * BudokaiConfig.ANGEL_MENTOR_BONUS_PER_RANK.get();
-		}
-		if (activity == TrainingActivity.MEDITATION && data.isAngel()) {
-			angelMult *= 1.0 + data.getAngelRank() * BudokaiConfig.ANGEL_MEDITATION_BONUS_PER_RANK.get();
+		double angelMult = 1.0 + bestGuidance;
+		boolean blessed = data.angel().isBlessed();
+		angelMult *= data.angel().getBlessingMultiplier();
+		if (activity == TrainingActivity.MEDITATION && AngelPath.hasRank(data, 1)) {
+			angelMult *= 1.0 + data.getAngelRank() * BudokaiConfig.ANGEL_MEDITATION_BONUS_PER_RANK.get() * AngelPath.perkStrength(data);
 		}
 
-		return new TrainingBonus(counted, partnerMult, leechMult, leechSource, mentorMult, angelMult);
+		return new TrainingBonus(counted, partnerMult, leechMult, leechSource, mentorMult, angelMult, guidingAngels, blessed);
 	}
 }

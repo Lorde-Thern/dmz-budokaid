@@ -1,5 +1,6 @@
 package com.dmzbudokai.data;
 
+import com.dmzbudokai.angel.AngelState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -24,6 +25,7 @@ public class TrainingData {
 	private boolean haloForcedByAngel;
 	private final Map<String, Integer> announcedFormLevels = new HashMap<>();
 	private final Set<String> metMasters = new HashSet<>();
+	private final AngelState angel = new AngelState();
 
 	// Runtime
 	private long lastRepTick = Long.MIN_VALUE / 2;
@@ -45,6 +47,9 @@ public class TrainingData {
 	public void setStatXp(String stat, double xp) {
 		statXp.put(stat, Math.max(0.0, xp));
 	}
+
+	/** Angel Path details: Whis's acceptance, Divine Favor, trials, abilities. */
+	public AngelState angel() { return angel; }
 
 	public int getAngelRank() { return angelRank; }
 	public void setAngelRank(int angelRank) { this.angelRank = Math.max(0, angelRank); }
@@ -115,6 +120,7 @@ public class TrainingData {
 		ListTag masters = new ListTag();
 		metMasters.forEach(id -> masters.add(StringTag.valueOf(id)));
 		tag.put("MetMasters", masters);
+		tag.put("Angel", angel.save());
 		return tag;
 	}
 
@@ -138,6 +144,7 @@ public class TrainingData {
 		for (int i = 0; i < masters.size(); i++) {
 			metMasters.add(masters.getString(i));
 		}
+		angel.load(tag.getCompound("Angel"));
 	}
 
 	public void copyFrom(TrainingData other) {
