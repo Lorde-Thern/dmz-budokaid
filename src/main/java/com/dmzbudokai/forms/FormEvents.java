@@ -39,7 +39,8 @@ public final class FormEvents {
 	/** True when DMZ's stat cap is too low for the configured form thresholds to be reachable. */
 	public static boolean isStatCapTooLow() {
 		int recommended = BudokaiConfig.RECOMMENDED_DMZ_MAX_VALUE.get();
-		return BudokaiConfig.BP_FORM_UNLOCKS.get() && recommended > 0 && DmzBridge.dmzMaxValue() < recommended;
+		return BudokaiConfig.BP_FORM_UNLOCKS.get() && !BudokaiConfig.LIMITLESS_MODE.get()
+				&& recommended > 0 && DmzBridge.dmzMaxValue() < recommended;
 	}
 
 	/** Right-clicking a master NPC (e.g. King Kai) meets the "talk to a master" requirement for their forms. */

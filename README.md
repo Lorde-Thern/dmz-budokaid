@@ -8,6 +8,8 @@ and your **Battle Power** rises with them.
 - **Partner training.** Training near other players who are also training gives bonus gains.
 - **Leeching.** Training near someone much stronger than you gives a large leech bonus. The stronger player gets a small mentor bonus for helping.
 - **Transformations by Battle Power.** Reach a BP threshold and the form unlocks: Super Saiyan at **1M** base BP, SSJ2 at 15M, and so on, on a realistic scale for every race.
+- **Realistic Battle Power.** Transforming multiplies your BP like in the show: Super Saiyan ×50, SSJ2 ×100, SSJ3 ×400, Kaioken ×N.
+- **Limitless mode (optional).** Removes every ceiling so you can keep getting stronger forever, without boosting gains.
 - **Custom races just work.** Any race Dragon Mine Z loads, including hand-made ones and races made with **DMZ Ragnarok**'s editor, trains and unlocks forms with no extra setup.
 - **The Angel Path.** An optional progression path with ranks, perks and a purity requirement. Built to work alongside **Dragon Block Noea**.
 
@@ -51,10 +53,54 @@ mentor multiplier  = x1.1 for the stronger player while someone leeches from the
 total              = partner * leech * mentor * angel * globalGainMultiplier
 ```
 
-Leeching compares **base** Battle Power (DMZ's BP with the power-release % removed), so powering up doesn't change who leeches from whom.
+Leeching compares **trained base** Battle Power (no transformations, buffs or power release), so powering up or transforming doesn't change who leeches from whom.
 Examples: a partner with 4x your BP gives x2.0, and 16x or more gives the x3.0 cap.
 
 A HUD panel on the left of the screen shows your current activity, Battle Power, partners, leech source and total multiplier while you train.
+
+## Realistic Battle Power
+
+With `realisticBattlePower = true` (the default), Battle Power works like Dragon Ball power levels:
+
+```
+shown BP   = trained base BP  x  form multiplier  x  stack form multiplier  x  power release %
+trained BP = DMZ's BP curve on your stats (race scaling and permanent bonuses included), nothing else
+```
+
+- **Training** raises your trained base BP. A fresh character starts in the hundreds, about where Goku was at the start of Z.
+- **Transforming** multiplies it, using canon-style numbers. A 1M-base Saiyan going Super Saiyan reads **50M**, like Goku's 3M to 150M on Namek.
+
+| Form | BP multiplier |
+|---|---|
+| Super Saiyan / Mastered | ×50 |
+| SSJ Grade 2 / Grade 3 | ×60 / ×75 |
+| SSJ2 / SSJ3 | ×100 / ×400 |
+| Oozaru / Golden Oozaru / SSJ4 | ×10 / ×500 / ×4000 |
+| Kaioken | ×2, ×3, ×4, ×10, ×20, ×100 |
+| Ultimate | ×100 |
+| Ultra Instinct / Ultra Ego | ×1000 (Sign), ×5000 (Mastered) |
+| Other races | Full table in `formBpMultipliers`; e.g. Frieza's final form ×4 then Full Power ×10, Perfect Cell ×6, Super Namekian ×50 |
+
+- **Forms with no number** (custom races, addon forms, god forms) use DMZ's own stat multiplier for that form raised to
+  `formBpFallbackExponent` (5.5). DMZ's ×1.5 becomes about ×9, ×2.25 about ×90, and ×3 about ×400, so custom forms still scale sensibly.
+- **Kaioken stacks** on top of a form, so SSJ + Kaioken x20 is ×1000.
+- **Everywhere DMZ shows BP** (scouter, stats screen, ki sense) shows the realistic number, via a small mixin. In DMZ, BP is only used for display and
+  comparisons, so **damage and combat balance are unchanged**: they still come from DMZ's stats and form multipliers.
+- **Form unlocks, leeching and the Angel Path** always use your **trained base BP**, so transforming or powering up never counts toward them.
+
+Turn it off with `realisticBattlePower = false` to go back to DMZ's own BP formula.
+
+## Limitless mode
+
+`limitlessMode = true` (off by default) removes the ceilings on growth:
+
+- Training ignores DMZ's total stat cap (`maxValue * 6`).
+- DMZ's per-stat cap is lifted too (including when player data reloads), via a small mixin.
+- The "raise DMZ's maxValue" warning is turned off, since the cap no longer applies.
+
+It does **not** boost anything: gains, costs, partner and leech bonuses all stay exactly the same. You just never hit a wall.
+The only remaining limit is that DMZ stores each stat as a whole number, so one stat tops out at 2,147,483,647. That's far beyond
+anything reachable by training, and a trained base BP in the trillions.
 
 ## Transformations by Battle Power
 
@@ -93,18 +139,18 @@ other forms a master too, or change who teaches what. Forms bought directly from
 Rough solo training time with default settings: SSJ about 3-4 hours of mixed training, SSJ2 roughly 25-30 hours. Partners and leeching cut that a lot.
 Tune `statXpGrowthPerPoint`, `globalGainMultiplier` or the thresholds to taste, then run `/budokai reload`.
 
-### Raise Dragon Mine Z's stat cap
+### Raise Dragon Mine Z's stat cap (or use limitless mode)
 
 DMZ caps total stats at `maxValue * 6` (in `config/dragonminez/general-server.json`, default 10000). That caps Battle Power:
 
-| DMZ `maxValue` | Max base BP (about) | Reaches |
+| DMZ `maxValue` | Max trained base BP (about) | Reaches |
 |---|---|---|
 | 10,000 (default) | 1.6M | SSJ only |
 | 250,000 | 78M | SSJ3 |
 | 1,000,000 | 414M | SSJ4 |
 | 4,000,000 | 2.2B | everything incl. Ultra Instinct |
 
-Set it with DMZ's `/dmzconfig` command or by editing the file. The server log and `/budokai forms` warn while it's below
+Set it with DMZ's `/dmzconfig` command or by editing the file, or turn on `limitlessMode` to remove the cap entirely. The server log and `/budokai forms` warn while it's below
 `recommendedDmzMaxValue` (1,000,000).
 
 ### Custom races (hand-made, DMZ Ragnarok, Dragon Block Noea)
@@ -201,6 +247,8 @@ src/main/java/com/dmzbudokai/
   config/BudokaiConfig       all server config values
   training/                  TrainingManager (XP to stats), PartnerTraining (partner/leech/mentor),
                              TrainingEvents (combat, meditation, sprint, TP cancel), TrainingActivity
+  compat/BattlePower         trained BP and realistic BP (form multipliers)
+  mixin/                     StatsDataMixin (DMZ reports realistic BP), StatsMixin (limitless per-stat cap)
   angel/AngelPath            Angel Path ranks, perks, purity check, Angelic Instinct
   forms/                     BP transformation unlocks (FormUnlocks) and form_unlocks.json (FormUnlockConfig)
   compat/DmzBridge           every Dragon Mine Z API call, in one place

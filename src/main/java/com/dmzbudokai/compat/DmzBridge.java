@@ -1,5 +1,6 @@
 package com.dmzbudokai.compat;
 
+import com.dmzbudokai.config.BudokaiConfig;
 import com.dragonminez.common.config.ConfigManager;
 import com.dragonminez.common.config.FormConfig;
 import com.dragonminez.common.stats.StatsCapability;
@@ -31,18 +32,14 @@ public final class DmzBridge {
 	}
 
 	/**
-	 * Battle Power with DMZ's power-release multiplier taken out, so players compare fairly
-	 * whether or not they are powered up. Never returns less than 1.
+	 * Trained Battle Power: no transformations, buffs or power release, so players compare fairly
+	 * whether or not they're transformed or powered up. Never returns less than 1.
 	 */
 	public static double baseBattlePower(StatsData data) {
-		double bp = data.getBattlePowerExact();
-		int release = Math.max(1, data.getResources().getPowerRelease());
-		double base = bp * 100.0 / release;
-		if (Double.isNaN(base) || base < 1.0) return 1.0;
-		return base;
+		return BattlePower.trained(data);
 	}
 
-	/** Current Battle Power exactly as DMZ shows it (includes power release and forms). */
+	/** Current Battle Power exactly as DMZ shows it (includes power release and forms; realistic when enabled). */
 	public static double currentBattlePower(StatsData data) {
 		return data.getBattlePowerExact();
 	}
@@ -56,7 +53,9 @@ public final class DmzBridge {
 	 * Returns the number of points actually added.
 	 */
 	public static int addStat(StatsData data, String stat, int amount) {
-		int allowed = data.getMaxAllowedIncreaseForStat(stat, amount);
+		// Limitless skips DMZ's total stat cap here; StatsMixin lifts DMZ's per-stat cap.
+		boolean limitless = BudokaiConfig.LIMITLESS_MODE.get();
+		int allowed = limitless ? amount : data.getMaxAllowedIncreaseForStat(stat, amount);
 		if (allowed <= 0) return 0;
 		int before = data.getCurrentStatValue(stat);
 		data.getStats().addStat(stat, allowed);

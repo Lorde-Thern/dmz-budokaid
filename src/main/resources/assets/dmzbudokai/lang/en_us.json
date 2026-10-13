@@ -25,7 +25,7 @@
   "dmzbudokai.message.exhausted": "You're too exhausted to train. Rest to recover stamina.",
   "dmzbudokai.message.no_character": "Create your Dragon Mine Z character first.",
   "dmzbudokai.info.header": "== Budokai Training ==",
-  "dmzbudokai.info.bp": "Battle Power: %s (base %s)",
+  "dmzbudokai.info.bp": "Battle Power: %s (trained base %s)",
   "dmzbudokai.info.stat": "%s: %s  (%s%% to next point)",
   "dmzbudokai.info.tp_disabled": "Training Points are disabled: train to grow stronger.",
   "dmzbudokai.info.angel": "Angel Path: %s",

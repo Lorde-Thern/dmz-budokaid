@@ -26,6 +26,14 @@ public final class BudokaiConfig {
 	public static final ForgeConfigSpec.BooleanValue BP_FORM_UNLOCKS;
 	public static final ForgeConfigSpec.IntValue RECOMMENDED_DMZ_MAX_VALUE;
 
+	// Battle Power
+	public static final ForgeConfigSpec.BooleanValue REALISTIC_BATTLE_POWER;
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> FORM_BP_MULTIPLIERS;
+	public static final ForgeConfigSpec.DoubleValue FORM_BP_FALLBACK_EXPONENT;
+
+	// Limitless
+	public static final ForgeConfigSpec.BooleanValue LIMITLESS_MODE;
+
 	// Activities
 	public static final ForgeConfigSpec.DoubleValue PUNCHING_BAG_XP;
 	public static final ForgeConfigSpec.IntValue PUNCHING_BAG_COOLDOWN;
@@ -153,6 +161,34 @@ public final class BudokaiConfig {
 				.defineInRange("sprintBlocksPerRep", 40.0, 1.0, 10000.0);
 		b.pop();
 
+		b.push("battlePower");
+		REALISTIC_BATTLE_POWER = b
+				.comment("Dragon Ball-style Battle Power: transformations multiply your BP like in the show",
+						"(Super Saiyan x50, SSJ2 x100, SSJ3 x400, Kaioken xN...) instead of DMZ's small stat boost.",
+						"Shown everywhere DMZ shows BP (scouter, stats screen, ki sense). BP is display/comparison only:",
+						"damage still comes from DMZ's stats. Form unlocks, leeching and the Angel Path always use your",
+						"trained base BP, so transforming never counts toward them.")
+				.define("realisticBattlePower", true);
+		FORM_BP_MULTIPLIERS = b
+				.comment("BP multiplier per form: \"<race>/<group>/<form>=<multiplier>\". Race \"*\" matches every race",
+						"(use it for stack forms like Kaioken). Forms not listed use their DMZ stat multiplier raised to",
+						"formBpFallbackExponent, so custom races' forms still scale. Use /budokai forms for exact names.")
+				.defineListAllowEmpty(List.of("formBpMultipliers"), BudokaiConfig::defaultFormBpMultipliers, o -> o instanceof String);
+		FORM_BP_FALLBACK_EXPONENT = b
+				.comment("For forms not in formBpMultipliers: BP multiplier = (average DMZ form stat multiplier) ^ this.",
+						"5.5 turns DMZ's x1.5 into about x9, x2.25 into about x90 and x3 into about x400.")
+				.defineInRange("formBpFallbackExponent", 5.5, 1.0, 20.0);
+		b.pop();
+
+		b.push("limitless");
+		LIMITLESS_MODE = b
+				.comment("Remove every ceiling on growth: DMZ's total stat cap (maxValue * 6) and per-stat cap are ignored",
+						"for training gains, so you can keep getting stronger forever. Gains are NOT boosted; training",
+						"works exactly the same, it just never stops. (Stats are whole numbers, so one stat tops out at",
+						"2,147,483,647, which is far beyond anything reachable.)")
+				.define("limitlessMode", false);
+		b.pop();
+
 		b.push("partnerTraining");
 		PARTNER_RADIUS = b.comment("How close (blocks) another trainee must be to count as your partner.")
 				.defineInRange("partnerRadius", 12.0, 1.0, 128.0);
@@ -216,6 +252,42 @@ public final class BudokaiConfig {
 		b.pop();
 
 		SPEC = b.build();
+	}
+
+	private static List<String> defaultFormBpMultipliers() {
+		return List.of(
+				// Saiyan
+				"saiyan/oozaru/oozaru=10", "saiyan/oozaru/goldenoozaru=500", "saiyan/oozaru/supersaiyan4=4000",
+				"saiyan/ssgrades/supersaiyan=50", "saiyan/ssgrades/supersaiyangrade2=60", "saiyan/ssgrades/supersaiyangrade3=75",
+				"saiyan/supersaiyan/supersaiyanmastered=50", "saiyan/supersaiyan/supersaiyan2=100",
+				"saiyan/supersaiyan/supersaiyan3=400", "saiyan/supersaiyan/supersaiyan4=4000",
+				"saiyan/legendaryforms/ikari=20", "saiyan/legendaryforms/ssjhybrid=60", "saiyan/legendaryforms/ssjfullpower=150",
+				// Human
+				"human/superforms/buffed=2", "human/superforms/fullpower=5", "human/superforms/overdrive=20",
+				"human/superforms/solaris=60",
+				"human/legendaryforms/shiyoken=10", "human/legendaryforms/shin_shiyoken=40", "human/legendaryforms/chou_shiyoken=150",
+				"human/androidforms/superandroid=10", "human/androidforms/fusedandroid=40",
+				// Namekian
+				"namekian/superforms/giant=2", "namekian/superforms/fullpower=5", "namekian/superforms/supernamekian=50",
+				"namekian/legendaryforms/evilnamek=10", "namekian/legendaryforms/evilgiantnamek=20",
+				"namekian/legendaryforms/buffednamek=60",
+				// Frost Demon
+				"frostdemon/evolutionforms/second=2", "frostdemon/evolutionforms/third=3", "frostdemon/evolutionforms/final=4",
+				"frostdemon/evolutionforms/fullpower=10", "frostdemon/evolutionforms/fifth=50",
+				"frostdemon/legendaryforms/mecha=5", "frostdemon/legendaryforms/metal=20", "frostdemon/legendaryforms/metalcore=80",
+				// Majin
+				"majin/pureforms/kid=5", "majin/pureforms/evil=3", "majin/pureforms/super=15", "majin/pureforms/ultra=50",
+				"majin/legendaryforms/innocencedemon=10", "majin/legendaryforms/giantinnocencedemon=20",
+				"majin/legendaryforms/superdemon=60",
+				// Bio-Android
+				"bioandroid/bioevolution/semiperfect=3", "bioandroid/bioevolution/perfect=6",
+				"bioandroid/bioevolution/superperfect=15", "bioandroid/bioevolution/ultraperfect=50",
+				"bioandroid/legendaryforms/xeno=10", "bioandroid/legendaryforms/xenofp=25", "bioandroid/legendaryforms/xenomax=60",
+				// Stack forms (any race)
+				"*/kaioken/x2=2", "*/kaioken/x3=3", "*/kaioken/x4=4", "*/kaioken/x10=10", "*/kaioken/x20=20", "*/kaioken/x100=100",
+				"*/ultimate/ultimate=100",
+				"*/ultrainstinct/sign=1000", "*/ultrainstinct/mastered=5000",
+				"*/ultraego/sign=1000", "*/ultraego/mastered=5000");
 	}
 
 	private BudokaiConfig() {
