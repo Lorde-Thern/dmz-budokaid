@@ -88,7 +88,25 @@ trained BP = DMZ's BP curve on your stats (race scaling and permanent bonuses in
   comparisons, so **damage and combat balance are unchanged**: they still come from DMZ's stats and form multipliers.
 - **Form unlocks, leeching and the Angel Path** always use your **trained base BP**, so transforming or powering up never counts toward them.
 
-Turn it off with `realisticBattlePower = false` to go back to DMZ's own BP formula.
+### Mobs
+
+Mob Battle Power uses the same scale (`realisticMobBattlePower`, on by default). DMZ rates a mob from its health, attack, armor and speed.
+That is matched to a player of equal strength (a player with every stat at *s* has about 20 + *s* health and 1 + *s* damage) and run
+through the same BP curve:
+
+| Mob | BP | | Mob | BP |
+|---|---|---|---|---|
+| Skeleton | ~50 | | Iron Golem | ~1,600 |
+| Zombie | ~170 | | Ender Dragon | ~2,700 |
+| *Fresh character* | *~230* | | Wither | ~4,200 |
+| Ravager | ~1,400 | | Warden | ~8,800 |
+
+- **DMZ creatures and raid waves** convert the same way, so their health and damage (including raid multipliers) still decide their BP.
+- **Story NPCs** (Goku 416 → 3M → 150M, Vegeta, Frieza 530K, Cell...) keep DMZ's hand-set canon numbers, which already fit this scale.
+- **Too weak for your modpack?** `mobBpMultiplier` scales every converted mob.
+- **Like player BP, it's display only.** Mob health and damage don't change.
+
+Turn it off with `realisticBattlePower = false` to go back to DMZ's own BP formula, or with `realisticMobBattlePower = false` to only change mobs back.
 
 ## Limitless mode
 
@@ -248,6 +266,7 @@ src/main/java/com/dmzbudokai/
   training/                  TrainingManager (XP to stats), PartnerTraining (partner/leech/mentor),
                              TrainingEvents (combat, meditation, sprint, TP cancel), TrainingActivity
   compat/BattlePower         trained BP and realistic BP (form multipliers)
+  compat/MobBattlePower      converts mob BP to the realistic scale when they spawn
   mixin/                     StatsDataMixin (DMZ reports realistic BP), StatsMixin (limitless per-stat cap)
   angel/AngelPath            Angel Path ranks, perks, purity check, Angelic Instinct
   forms/                     BP transformation unlocks (FormUnlocks) and form_unlocks.json (FormUnlockConfig)

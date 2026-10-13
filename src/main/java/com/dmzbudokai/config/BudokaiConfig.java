@@ -30,6 +30,8 @@ public final class BudokaiConfig {
 	public static final ForgeConfigSpec.BooleanValue REALISTIC_BATTLE_POWER;
 	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> FORM_BP_MULTIPLIERS;
 	public static final ForgeConfigSpec.DoubleValue FORM_BP_FALLBACK_EXPONENT;
+	public static final ForgeConfigSpec.BooleanValue REALISTIC_MOB_BATTLE_POWER;
+	public static final ForgeConfigSpec.DoubleValue MOB_BP_MULTIPLIER;
 
 	// Limitless
 	public static final ForgeConfigSpec.BooleanValue LIMITLESS_MODE;
@@ -178,6 +180,15 @@ public final class BudokaiConfig {
 				.comment("For forms not in formBpMultipliers: BP multiplier = (average DMZ form stat multiplier) ^ this.",
 						"5.5 turns DMZ's x1.5 into about x9, x2.25 into about x90 and x3 into about x400.")
 				.defineInRange("formBpFallbackExponent", 5.5, 1.0, 20.0);
+		REALISTIC_MOB_BATTLE_POWER = b
+				.comment("Put mob Battle Power on the same realistic scale (needs realisticBattlePower).",
+						"A mob's health and damage are matched to a player of equal strength and run through the",
+						"player BP curve: a zombie reads ~170 next to a fresh character's ~230, the Ender Dragon ~2,700.",
+						"Story NPCs (Goku, Vegeta, Frieza, Cell...) keep DMZ's canon numbers. Display only, like player BP.")
+				.define("realisticMobBattlePower", true);
+		MOB_BP_MULTIPLIER = b
+				.comment("Multiplies every converted mob BP. Raise it if mobs read too weak for your modpack.")
+				.defineInRange("mobBpMultiplier", 1.0, 0.0, 1.0E9);
 		b.pop();
 
 		b.push("limitless");

@@ -49,6 +49,14 @@ public final class BattlePower {
 		return Double.isNaN(bp) || bp < 1.0 ? 1.0 : bp;
 	}
 
+	/** BP for someone with every stat at {@code stat} and default (1.0) stat scaling. */
+	public static double curveForEvenStats(double stat) {
+		// STR + SKP + DEF + PWR at full weight, VIT + ENE at half weight.
+		double raw = stat * 4.0 + SUPPORT_STAT_BP_WEIGHT * stat * 2.0;
+		if (!(raw > 0)) return 0.0;
+		return BP_REF_VALUE * Math.pow(raw / K, BP_CURVE_EXPONENT);
+	}
+
 	private static double part(StatsData data, String bonusKey, String scalingKey, int value) {
 		double mult = data.getBonusStats().calculateBonus(bonusKey, value, true);
 		double flat = data.getBonusStats().calculateBonus(bonusKey, value, false);
