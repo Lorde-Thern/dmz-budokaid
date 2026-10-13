@@ -134,6 +134,16 @@ public final class DmzBridge {
 		}
 	}
 
+	/** DMZ's training bonus for high gravity (planets, gravity rooms, King Kai), when enabled in our config. */
+	public static double gravityTrainingMultiplier(StatsData data) {
+		if (!BudokaiConfig.GRAVITY_TRAINING_BONUS.get()) return 1.0;
+		try {
+			return Math.max(1.0, data.getTpGravityMultiplier());
+		} catch (RuntimeException e) {
+			return 1.0;
+		}
+	}
+
 	/** DMZ's level/stat cap from general-server.json ({@code gameplay.maxValue}). */
 	public static int dmzMaxValue() {
 		try {

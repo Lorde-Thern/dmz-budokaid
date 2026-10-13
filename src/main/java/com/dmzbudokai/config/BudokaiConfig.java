@@ -33,6 +33,10 @@ public final class BudokaiConfig {
 	public static final ForgeConfigSpec.BooleanValue REALISTIC_MOB_BATTLE_POWER;
 	public static final ForgeConfigSpec.DoubleValue MOB_BP_MULTIPLIER;
 
+	// Planets
+	public static final ForgeConfigSpec.ConfigValue<List<? extends String>> PLANET_GRAVITY;
+	public static final ForgeConfigSpec.BooleanValue GRAVITY_TRAINING_BONUS;
+
 	// Limitless
 	public static final ForgeConfigSpec.BooleanValue LIMITLESS_MODE;
 
@@ -211,6 +215,18 @@ public final class BudokaiConfig {
 		MOB_BP_MULTIPLIER = b
 				.comment("Multiplies every converted mob BP. Raise it if mobs read too weak for your modpack.")
 				.defineInRange("mobBpMultiplier", 1.0, 0.0, 1.0E9);
+		b.pop();
+
+		b.push("planets");
+		PLANET_GRAVITY = b
+				.comment("Gravity for custom planets, as \"<dimension>=<gravity>\" (1.0 = normal). Applied through Dragon Mine Z's",
+						"gravity system, so it slows movement and boosts training. A gravityPerWorld entry for the same",
+						"dimension in DMZ's general-server.json takes priority.")
+				.defineListAllowEmpty(List.of("planetGravity"), () -> List.of("dmzbudokai:planet_vegeta=10"), o -> o instanceof String);
+		GRAVITY_TRAINING_BONUS = b
+				.comment("Training under high gravity (planets like Vegeta, DMZ gravity rooms, King Kai) gives bonus gains,",
+						"using DMZ's own gravity training multiplier (which normally only boosts Training Points).")
+				.define("gravityTrainingBonus", true);
 		b.pop();
 
 		b.push("limitless");

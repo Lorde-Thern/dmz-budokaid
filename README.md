@@ -11,6 +11,7 @@ and your **Battle Power** rises with them.
 - **Realistic Battle Power.** Transforming multiplies your BP like in the show: Super Saiyan ×50, SSJ2 ×100, SSJ3 ×400, Kaioken ×N.
 - **Limitless mode (optional).** Removes every ceiling so you can keep getting stronger forever, without boosting gains.
 - **Custom races just work.** Any race Dragon Mine Z loads, including hand-made ones and races made with **DMZ Ragnarok**'s editor, trains and unlocks forms with no extra setup.
+- **Custom planets.** Planet Vegeta (red badlands, lava seas, 10× gravity) in the DMZ space pod, and an easy way to add more.
 - **The Angel Path.** An optional progression path with ranks, perks and a purity requirement. Built to work alongside **Dragon Block Noea**.
 
 Requires Dragon Mine Z **2.1.x** (built against 2.1.3) and its own dependencies (GeckoLib, TerraBlender, Curios).
@@ -270,6 +271,44 @@ By default the races `demon` and `glind` (Noea's demon race) **cannot** walk the
 your version, edit `angelForbiddenRaces` in the config to match. Run `/budokai angel info` while playing a Noea race to see the name being read.
 `noeaModIds` only affects whether `/budokai angel info` mentions Noea.
 
+## Custom planets
+
+Budokai adds planets to Dragon Mine Z's **space pod**. The first one is **Planet Vegeta**:
+
+- **Terrain:** red badlands. Red sand plains, banded terracotta cliffs and spires, and seas of lava in the lowlands.
+- **Sky:** a red sky and haze, with ash in the air. No rain.
+- **Gravity: 10×**, through DMZ's own gravity system. Movement, jumping and flying are harder, and **training there gives bonus gains**
+  (DMZ's gravity training multiplier, which now applies to Budokai training instead of only to Training Points).
+- **Underground:** caves, canyons, and coal, iron, gold, redstone and diamond ores.
+- **Mobs:** husks, skeletons and magma cubes.
+- **Getting there:** pick it in any space pod. It's unlocked for everyone by default. When you arrive, the pod is moved onto the nearest dry,
+  solid ground, so you won't land inside a mountain or in lava.
+
+Gravity training works anywhere DMZ applies gravity (gravity rooms, King Kai's planet), not just on Vegeta. Turn it off with `gravityTrainingBonus = false`.
+
+### Adding your own planets
+
+Planets are plain datapack files, so you can add more (Namek-style, a Beerus planet, Yardrat...) with a datapack or a resource folder in this mod.
+Copy Planet Vegeta's files and rename them:
+
+```
+data/<namespace>/dimension/<planet>.json               the dimension (points at the type, noise settings and biome)
+data/<namespace>/dimension_type/<planet>.json          sky light, height, bed behaviour...
+data/<namespace>/worldgen/biome/<biome>.json           sky/fog colours, mobs, ores, caves
+data/<namespace>/worldgen/noise_settings/<planet>.json terrain shape, surface blocks, sea fluid
+data/<namespace>/budokai_planets/<planet>.json         the space pod destination
+```
+
+- **Destination file:** uses Dragon Mine Z's own space pod destination format, so every DMZ unlock rule works
+  (`"ALWAYS"`, `{"race": "saiyan"}`, `{"quest": "..."}`, `{"level": 50}`, `and`/`or`/`not`...). Point `icon_texture` at an 11×11 PNG.
+- **Gravity:** add `"<namespace>:<planet>=<gravity>"` to `planetGravity` in the server config.
+- **Why not DMZ's own destination file?** DMZ's file uses `"replace": true`, which wipes destinations added before it. The `budokai_planets`
+  folder is merged into DMZ's list by a small mixin instead, so it can't be wiped. This also means destinations from other addons stay intact.
+
+**Dragon Block Noea's space travel:** I couldn't inspect Noea's code. If Noea travels between planets with DMZ's space pod, Planet Vegeta
+shows up there automatically. If Noea has its own separate space system, Planet Vegeta is still reachable with DMZ's space pod, but
+showing it in Noea's own menu would need Noea-specific support.
+
 ## Commands
 
 | Command | |
@@ -311,7 +350,9 @@ src/main/java/com/dmzbudokai/
                              TrainingEvents (combat, meditation, sprint, TP cancel), TrainingActivity
   compat/BattlePower         trained BP and realistic BP (form multipliers)
   compat/MobBattlePower      converts mob BP to the realistic scale when they spawn
-  mixin/                     StatsDataMixin (DMZ reports realistic BP), StatsMixin (limitless per-stat cap)
+  mixin/                     StatsDataMixin (realistic BP), StatsMixin (limitless per-stat cap),
+                             SpacePodRegistryMixin (adds planets to the space pod), GravityConfigMixin (planet gravity)
+  planets/                   custom planet loading (PlanetRegistry) and safe space pod landing (PlanetArrival)
   angel/AngelPath            Angel Path initiation, ranks, Divine Favor, falling, passive perks
   angel/AngelTrial           the trial for each rank
   angel/AngelAbilities       Angelic Instinct, Temporal Do-Over, Divine Presence, Angel's Blessing

@@ -1,0 +1,67 @@
+{
+  "has_precipitation": false,
+  "temperature": 2.0,
+  "downfall": 0.0,
+  "effects": {
+    "sky_color": 12603450,
+    "fog_color": 14251087,
+    "water_color": 9120286,
+    "water_fog_color": 4133904,
+    "grass_color": 10373678,
+    "foliage_color": 9058850,
+    "particle": {
+      "options": {
+        "type": "minecraft:white_ash"
+      },
+      "probability": 0.004
+    }
+  },
+  "spawners": {
+    "monster": [
+      { "type": "minecraft:husk", "weight": 80, "minCount": 2, "maxCount": 4 },
+      { "type": "minecraft:skeleton", "weight": 40, "minCount": 1, "maxCount": 3 },
+      { "type": "minecraft:magma_cube", "weight": 30, "minCount": 1, "maxCount": 2 }
+    ],
+    "creature": [],
+    "ambient": [],
+    "axolotls": [],
+    "underground_water_creature": [],
+    "water_creature": [],
+    "water_ambient": [],
+    "misc": []
+  },
+  "spawn_costs": {},
+  "carvers": {
+    "air": [
+      "minecraft:cave",
+      "minecraft:cave_extra_underground",
+      "minecraft:canyon"
+    ]
+  },
+  "features": [
+    [],
+    [
+      "minecraft:lake_lava_underground",
+      "minecraft:lake_lava_surface"
+    ],
+    [],
+    [],
+    [],
+    [],
+    [
+      "minecraft:ore_coal_upper",
+      "minecraft:ore_iron_upper",
+      "minecraft:ore_iron_middle",
+      "minecraft:ore_iron_small",
+      "minecraft:ore_gold",
+      "minecraft:ore_redstone",
+      "minecraft:ore_diamond"
+    ],
+    [],
+    [
+      "minecraft:spring_lava"
+    ],
+    [],
+    []
+  ]
+}

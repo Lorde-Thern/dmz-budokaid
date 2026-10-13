@@ -134,5 +134,6 @@
   "dmzbudokai.angel.info.ability_locked": "[✘] %s (unlocks at %s)",
   "dmzbudokai.angel.info.rewind_cooldown": "Temporal Do-Over recharging: %s minute(s)",
   "dmzbudokai.angel.info.bless_cooldown": "Angel's Blessing recharging: %s second(s)",
-  "dmzbudokai.admin.angelfavor": "Set %s's Divine Favor to %s"
+  "dmzbudokai.admin.angelfavor": "Set %s's Divine Favor to %s",
+  "dmzbudokai.planet.planet_vegeta": "Planet Vegeta"
 }

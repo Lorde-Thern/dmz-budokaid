@@ -1,0 +1,9 @@
+{
+  "id": "planet_vegeta",
+  "name": "dmzbudokai.planet.planet_vegeta",
+  "translate": true,
+  "dimension": "dmzbudokai:planet_vegeta",
+  "icon_texture": "dmzbudokai:textures/gui/planets/planet_vegeta.png",
+  "show_when_locked": true,
+  "unlock_rules": "ALWAYS"
+}

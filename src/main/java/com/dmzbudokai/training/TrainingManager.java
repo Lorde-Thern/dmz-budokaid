@@ -46,7 +46,8 @@ public final class TrainingManager {
 		}
 
 		TrainingBonus bonus = PartnerTraining.compute(player, stats, data, activity);
-		double xp = activity.baseXp() * BudokaiConfig.GLOBAL_GAIN_MULTIPLIER.get() * bonus.total();
+		double xp = activity.baseXp() * BudokaiConfig.GLOBAL_GAIN_MULTIPLIER.get() * bonus.total()
+				* DmzBridge.gravityTrainingMultiplier(stats);
 
 		int gained = 0;
 		for (String stat : activity.stats()) {
